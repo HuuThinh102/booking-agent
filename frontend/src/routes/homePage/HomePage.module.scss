@@ -1,0 +1,36 @@
+.homepage {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5em;
+
+    .left {
+        align-items: center;
+        text-align: center;
+        h1 {
+            font-size: 128px;
+            background: linear-gradient(to right, #217bfe, #e55571);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        h2 {
+            font-size: 20px;
+            margin-bottom: 1rem;
+        }
+        a {
+            padding: 10px 15px;
+            background-color: #217bfe;
+            color: white;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+    }
+    .right {
+        img {
+            height: 30rem;
+            width: 30rem;
+        }
+    }
+}

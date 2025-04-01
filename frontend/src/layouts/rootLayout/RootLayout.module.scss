@@ -1,0 +1,43 @@
+.rootLayout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1em 1em;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            gap: 8px;
+
+            span {
+                font-size: 24px;
+                background: linear-gradient(to right, #217bfe, #e55571);
+                // background: rgb(147, 146, 146);
+                background-clip: text;
+                -webkit-background-clip: text;
+                color: transparent;
+            }
+
+            img {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+        }
+    }
+  
+    main {
+        flex: 1;
+        overflow: hidden;
+    }
+}

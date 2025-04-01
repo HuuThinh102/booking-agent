@@ -1,0 +1,110 @@
+import os
+from datetime import datetime, timedelta
+import re
+from langchain.agents import initialize_agent, AgentType
+from langchain_google_genai import GoogleGenerativeAI
+from langchain.memory import ConversationBufferMemory
+from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
+from langchain_community.utilities import SQLDatabase
+from langchain.schema import SystemMessage, AIMessage, HumanMessage
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class BookingAgent:
+    def __init__(self):
+        self.db = None
+        self.agent = None
+        system_message = """
+You are a meeting room booking assistant. Your task is to help users book a meeting room by collecting four specific pieces of information: the room name, the date, the start time, and the end time.
+
+Follow these steps:
+1. Greet the user and ask for the booking details.
+2. From the user's response, extract any provided information: room name, date, start time, end time.
+3. If any of the four pieces are missing, ask the user to provide the missing information.
+4. Repeat step 3 until all four pieces of information are collected.
+5. Once you have all four, confirm the booking details with the user.
+6. If the user confirms, use the SQL tool to insert the booking into the database.
+Example: INSERT INTO Booking (idRoom, idEmployee, start_time, end_time, date) SELECT idRoom, 'huuthinhtranct2002@gmail.com', '08:00:00', '09:00:00', '2025-03-04' FROM Room WHERE room_name = 'Guadalajara'; 
+7. Inform the user that the booking has been made.
+
+Do not ask for any other information beyond these four pieces. If the user provides information that is not relevant, politely steer the conversation back to collecting the required information.
+"""
+        self.chat_history = [
+            SystemMessage(content=system_message),
+        ]
+        self.init_database(
+            user=os.getenv('MYSQL_USER', 'root'),
+            password=os.getenv('MYSQL_PASSWORD', 'huuthinhct'),
+            host=os.getenv('MYSQL_HOST', 'localhost'),
+            port=os.getenv('MYSQL_PORT', '3306'),
+            database=os.getenv('MYSQL_DATABASE', 'meeting')
+        )
+
+    def init_database(self, user: str, password: str, host: str, port: str, database: str) -> bool:
+        try:
+            db_uri = f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}"
+            self.db = SQLDatabase.from_uri(db_uri)
+            self.agent = self._get_agent()
+            return True
+        except Exception as e:
+            print(f"Database connection error: {e}")
+            return False
+
+    def _get_agent(self):
+        llm = GoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
+        toolkit = SQLDatabaseToolkit(db=self.db, llm=llm)
+        
+        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+
+        agent = initialize_agent(
+            tools=toolkit.get_tools(),
+            llm=llm,
+            agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION,
+            memory=memory,
+            verbose=True
+        )
+
+        return agent
+
+    def _get_today_and_tomorrow(self):
+        today = datetime.today().strftime('%Y-%m-%d')
+        tomorrow = (datetime.today() + timedelta(days=1)).strftime('%Y-%m-%d')
+        return today, tomorrow
+
+    def _preprocess_query(self, user_query: str) -> str:
+        today, tomorrow = self._get_today_and_tomorrow()
+        user_query = re.sub(r'\btoday\b', today, user_query, flags=re.IGNORECASE)
+        user_query = re.sub(r'\btomorrow\b', tomorrow, user_query, flags=re.IGNORECASE)
+        return user_query
+
+    def get_response(self, user_query: str):
+        if self.agent is None:
+            return {
+                "status": "error",
+                "message": "Please connect to the database first."
+            }
+        
+        processed_query = self._preprocess_query(user_query)
+        
+        try:
+            response = self.agent.run(processed_query)
+            self.chat_history.extend([
+                HumanMessage(content=user_query),
+                AIMessage(content=response)
+            ])
+            return {
+                "status": "success",
+                "message": response,
+                "chat_history": [
+                    {"role": "system" if isinstance(msg, SystemMessage) else 
+                             "ai" if isinstance(msg, AIMessage) else "human",
+                     "content": msg.content}
+                    for msg in self.chat_history
+                ]
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"An error occurred: {str(e)}"
+            }
