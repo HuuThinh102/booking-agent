@@ -22,11 +22,11 @@ class BookingAgent:
             SystemMessage(content=system_message),
         ]
         self.init_database(
-            user=os.getenv('MYSQL_USER', 'root'),
-            password=os.getenv('MYSQL_PASSWORD', 'huuthinhct'),
-            host=os.getenv('MYSQL_HOST', 'localhost'),
+            user=os.getenv('MYSQL_USER', 'sql12770793'),
+            password=os.getenv('MYSQL_PASSWORD', 'f9I3gp1U5n'),
+            host=os.getenv('MYSQL_HOST', 'sql12.freesqldatabase.com'),
             port=os.getenv('MYSQL_PORT', '3306'),
-            database=os.getenv('MYSQL_DATABASE', 'meeting_booking_db')
+            database=os.getenv('MYSQL_DATABASE', 'sql12770793')
         )
 
     def init_database(self, user: str, password: str, host: str, port: str, database: str) -> bool:
