@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from agent.agent_booking import BookingAgent  
+from agent.booking_agent import BookingAgent  
 from db import mysql
 
 booking_agent = BookingAgent()
@@ -10,7 +10,7 @@ def get_messages():
     idconversation = request.args.get('idconversation')
 
     if not idconversation:
-        return jsonify({"error": "Thiếu idconversation"}), 400
+        return jsonify({"error": "Missing idconversation"}), 400
 
     cursor = None
     try:
@@ -43,14 +43,14 @@ def create_message():
         cnx = mysql.connection
         cursor = cnx.cursor(dictionary=True)
 
-        # Lưu tin nhắn của user
+        # Store user's message
         cursor.execute("INSERT INTO messages (idconversation, sender, content) VALUES (%s, 'user', %s)", (idconversation, user_message))
         cnx.commit()
 
-        # Gọi AI để trả lời
+        # Get reponse from AI Agent
         ai_response = booking_agent.get_response(user_message)["message"]
 
-        # Lưu tin nhắn AI
+        # Store agent's message
         cursor.execute("INSERT INTO messages (idconversation, sender, content) VALUES (%s, 'ai', %s)", (idconversation, ai_response))
         cnx.commit()
 

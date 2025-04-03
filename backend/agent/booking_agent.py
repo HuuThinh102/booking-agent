@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-with open('../system_message.txt', 'r') as f:
+with open('./system_messages_2.txt', 'r') as f:
     system_message = f.read()
 
 class BookingAgent:

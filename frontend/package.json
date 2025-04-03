@@ -14,7 +14,7 @@
     "@ant-design/x": "^1.0.6",
     "@clerk/clerk-react": "^5.24.2",
     "@tailwindcss/vite": "^4.0.14",
-    "antd": "^5.24.4",
+    "antd": "^5.24.6",
     "axios": "^1.8.4",
     "postcss-cli": "^11.0.1",
     "react": "^19.0.0",
@@ -42,6 +42,5 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"
-  },
-  "proxy": "http://127.0.0.1:5000/"
+  }
 }

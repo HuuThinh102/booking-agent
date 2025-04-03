@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useUser } from '@clerk/clerk-react';
 import { Modal, Input } from "antd";
 
+export const BASE_URL = import.meta.env.MODE === "development" ? "http://127.0.0.1:5000" : "";
+
 interface ConversationItem {
     key: string;
     label: string;
@@ -71,7 +73,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const handleRename = async (idconversation: string, newTitle: string) => {
         try {
-            await axios.put(`http://127.0.0.1:5000/conversation`, {
+            await axios.put(`${BASE_URL}/conversation`, {
                 idconversation,
                 title: newTitle,
             });
@@ -90,7 +92,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             okType: "danger",
             onOk: async () => {
                 try {
-                    await axios.delete(`http://127.0.0.1:5000/conversation`, {
+                    await axios.delete(`${BASE_URL}/conversation`, {
                         data: { idconversation: idconversation },
                     });
 
@@ -113,7 +115,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const fetchConversations = async () => {
         try {
-            const response = await axios.get(`http://127.0.0.1:5000/conversation?iduser=${iduser}`, {
+            const response = await axios.get(`${BASE_URL}/conversation?iduser=${iduser}`, {
                 headers: {
                     Accept: '*/*',
                     'Content-Type': 'application/json',
@@ -138,7 +140,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const handleSubmit = async (messageContent: string) => {
         setIsLoading(true);
         try {
-            const response = await axios.post('http://127.0.0.1:5000/conversation', {
+            const response = await axios.post(`${BASE_URL}/conversation`, {
                 iduser: iduser,
                 first_message: messageContent
             });
@@ -153,7 +155,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             setActiveKey(conversationId);
 
-            await axios.post('http://127.0.0.1:5000/messages', {
+            await axios.post(`${BASE_URL}/messages`, {
                 idconversation: conversationId,
                 sender: 'user',
                 content: messageContent,
@@ -163,7 +165,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (error) {
             console.error('Error when creating converation:', error);
         } finally {
-            setIsLoading(false); // Tắt loading khi API hoàn thành
+            setIsLoading(false);
         }
     };
 
@@ -181,7 +183,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMessages((prev) => [...prev, newMessage]);
 
         try {
-            const response = await axios.post('http://127.0.0.1:5000/messages', {
+            const response = await axios.post(`${BASE_URL}/messages`, {
                 idconversation: id,
                 content: message,
             });

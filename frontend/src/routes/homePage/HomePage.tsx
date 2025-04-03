@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import styles from './HomePage.module.scss';
 
-const HomePage = () => {
 
+const HomePage = () => {
     return (
         <div className={styles.homepage}>
             <div className={styles.left}>

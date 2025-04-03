@@ -5,6 +5,7 @@ import { SignedIn, UserButton } from '@clerk/clerk-react'
 import { useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 import axios from "axios";
+import { BASE_URL } from '../../context/ChatContext'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -29,7 +30,7 @@ const UserInfoWrapper = () => {
             const iduser = user.primaryEmailAddress?.emailAddress;
             const username = user.fullName;
 
-            axios.post("http://127.0.0.1:5000/auth", { iduser, username }, {
+            axios.post(`${BASE_URL}/auth`, { iduser, username }, {
                 headers: {
                     "Accept": "*/*",
                     "Content-Type": "application/json"

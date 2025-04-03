@@ -7,6 +7,7 @@ import axios from 'axios';
 import Loading from '../../components/loading/Loading';
 import { useChatContext } from '../../context/ChatContext';
 import { v4 as uuidv4 } from 'uuid';
+import { BASE_URL } from '../../context/ChatContext'
 
 
 const ChatPage = () => {
@@ -31,7 +32,7 @@ const ChatPage = () => {
             setMessages([]);
             setIsLoading(true);
             try {
-                const response = await axios.get(`http://127.0.0.1:5000/messages?idconversation=${id}`);
+                const response = await axios.get(`${BASE_URL}/messages?idconversation=${id}`);
                 if (response.data.messages) {
                     setMessages(response.data.messages);
                 }
