@@ -34,9 +34,10 @@ def create_message():
     data = request.json
     idconversation = data.get('idconversation')
     user_message = data.get('content')
+    iduser = data.get('iduser')
 
     if not idconversation or not user_message:
-        return jsonify({"error": "Thiếu idconversation hoặc nội dung"}), 400
+        return jsonify({"error": "Missing idconversation or content"}), 400
 
     cursor = None
     try:
@@ -48,7 +49,7 @@ def create_message():
         cnx.commit()
 
         # Get reponse from AI Agent
-        ai_response = booking_agent.get_response(user_message)["message"]
+        ai_response = booking_agent.get_response(user_message, iduser)["message"]
 
         # Store agent's message
         cursor.execute("INSERT INTO messages (idconversation, sender, content) VALUES (%s, 'ai', %s)", (idconversation, ai_response))
@@ -58,7 +59,6 @@ def create_message():
             "user_message": user_message,
             "ai_response": ai_response
         }), 200
-
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

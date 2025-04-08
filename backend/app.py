@@ -8,18 +8,19 @@ from db import init_db, mysql
 from agent.booking_agent import BookingAgent
 import os
 
-app = Flask(__name__)
+load_dotenv()
 
+app = Flask(__name__)
 # app.config['MYSQL_HOST'] = 'localhost'
 # app.config['MYSQL_USER'] = 'root'
-# app.config['MYSQL_PASSWORD'] = 'huuthinhct'
+# app.config['MYSQL_PASSWORD'] = ''
 # app.config['MYSQL_DATABASE'] = 'ai_agent'
 
-app.config['MYSQL_HOST'] = 'sql12.freesqldatabase.com'
-app.config['MYSQL_USER'] = 'sql12770793'
-app.config['MYSQL_PASSWORD'] = 'f9I3gp1U5n'
-app.config['MYSQL_DATABASE'] = 'sql12770793'
-app.config['MYSQL_PORT'] = 3306
+app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+app.config['MYSQL_DATABASE'] = os.getenv('MYSQL_DATABASE')
+app.config['MYSQL_PORT'] = int(os.getenv('MYSQL_PORT'))
 
 init_db(app)
 CORS(app)
@@ -30,12 +31,12 @@ booking_agent = BookingAgent()
 frontend_folder = os.path.join(os.getcwd(),"..","frontend")
 dist_folder = os.path.join(frontend_folder, "dist")
 
-@app.route("/", defaults={"filename":""})
-@app.route("/<path:filename>")
-def index(filename):
-    if filename and os.path.exists(os.path.join(dist_folder, filename)):
-        return send_from_directory(dist_folder, filename)
-    return send_from_directory(dist_folder, "index.html")
+# @app.route("/", defaults={"filename":""})
+# @app.route("/<path:filename>")
+# def index(filename):
+#     if filename and os.path.exists(os.path.join(dist_folder, filename)):
+#         return send_from_directory(dist_folder, filename)
+#     return send_from_directory(dist_folder, "index.html")
 
 app.register_blueprint(auth_user_routes)
 app.register_blueprint(conversation_routes)
@@ -43,4 +44,4 @@ app.register_blueprint(message_routes)
 
 # app.run(debug=True, port=5000)
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

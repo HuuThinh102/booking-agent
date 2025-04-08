@@ -51,7 +51,7 @@ def add_conversation():
     first_message = data.get('first_message')
 
     if not iduser:
-        return jsonify({"error": "Miss iduser"}), 400
+        return jsonify({"error": "Missing iduser"}), 400
     if not title and first_message:
         title = generate_title_from_gemini(first_message)
         print("title", title)
@@ -65,7 +65,7 @@ def add_conversation():
         cursor.execute("INSERT INTO conversations (iduser, title) VALUES (%s, %s)", (iduser, title))
         cnx.commit()
 
-        idconversation = cursor.lastrowid  # Lấy ID của conversation vừa thêm
+        idconversation = cursor.lastrowid  # Get ID of new conversation
 
         return jsonify({
             "message": "Create new conversation successful",

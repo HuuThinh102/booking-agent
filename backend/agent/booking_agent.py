@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-with open('./system_messages_2.txt', 'r') as f:
+with open('./system_messages_3.txt', 'r') as f:
     system_message = f.read()
 
 class BookingAgent:
@@ -22,11 +22,11 @@ class BookingAgent:
             SystemMessage(content=system_message),
         ]
         self.init_database(
-            user=os.getenv('MYSQL_USER', 'sql12770793'),
-            password=os.getenv('MYSQL_PASSWORD', 'f9I3gp1U5n'),
-            host=os.getenv('MYSQL_HOST', 'sql12.freesqldatabase.com'),
-            port=os.getenv('MYSQL_PORT', '3306'),
-            database=os.getenv('MYSQL_DATABASE', 'sql12770793')
+            user=os.getenv('MYSQL_USER'),
+            password=os.getenv('MYSQL_PASSWORD'),
+            host=os.getenv('MYSQL_HOST'),
+            port=os.getenv('MYSQL_PORT'),
+            database=os.getenv('MYSQL_DATABASE')
         )
 
     def init_database(self, user: str, password: str, host: str, port: str, database: str) -> bool:
@@ -66,7 +66,7 @@ class BookingAgent:
         user_query = re.sub(r'\btomorrow\b', tomorrow, user_query, flags=re.IGNORECASE)
         return user_query
 
-    def get_response(self, user_query: str):
+    def get_response(self, user_query: str, iduser: str):
         if self.agent is None:
             return {
                 "status": "error",
@@ -75,8 +75,11 @@ class BookingAgent:
         
         processed_query = self._preprocess_query(user_query)
         
+        full_query = f"{system_message}\n\nUser's prompt: {processed_query}\nUser ID: {iduser}"
+        print(full_query)
+        
         try:
-            response = self.agent.run(processed_query)
+            response = self.agent.run(full_query)
             self.chat_history.extend([
                 HumanMessage(content=user_query),
                 AIMessage(content=response)
@@ -86,8 +89,8 @@ class BookingAgent:
                 "message": response,
                 "chat_history": [
                     {"role": "system" if isinstance(msg, SystemMessage) else 
-                             "ai" if isinstance(msg, AIMessage) else "human",
-                     "content": msg.content}
+                            "ai" if isinstance(msg, AIMessage) else "human",
+                    "content": msg.content}
                     for msg in self.chat_history
                 ]
             }
@@ -96,3 +99,9 @@ class BookingAgent:
                 "status": "error",
                 "message": f"An error occurred: {str(e)}"
             }
+        
+    def print_chat_history(self):
+        print("\n=== Chat History ===")
+        for msg in self.chat_history:
+            role = "System" if isinstance(msg, SystemMessage) else "AI" if isinstance(msg, AIMessage) else "Human"
+            print(f"{role}: {msg.content}")

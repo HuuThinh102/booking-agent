@@ -13,6 +13,7 @@ interface ConversationItem {
 
 interface Message {
     idconversation: number;
+    iduser: string;
     sender: 'user' | 'ai';
     content: string;
 }
@@ -127,7 +128,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 label: conv.title,
             })));
         } catch (error) {
-            console.error('Lỗi khi lấy danh sách cuộc hội thoại:', error);
+            console.error('Error when fetching conversations:', error);
         }
     };
 
@@ -177,6 +178,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const newMessage: Message = {
             idconversation: Number(id),
+            iduser: String(iduser),
             sender: 'user',
             content: message,
         };
@@ -185,12 +187,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const response = await axios.post(`${BASE_URL}/messages`, {
                 idconversation: id,
+                iduser: iduser,
                 content: message,
             });
 
             if (response.data.ai_response) {
                 const aiMessage: Message = {
                     idconversation: Number(id),
+                    iduser: String(iduser),
                     sender: 'ai',
                     content: response.data.ai_response,
                 };

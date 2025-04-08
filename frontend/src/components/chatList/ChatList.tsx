@@ -1,14 +1,18 @@
 import styles from './ChatList.module.scss';
 import { Conversations } from '@ant-design/x';
-import { Button, GetProp } from 'antd';
+import { Button, GetProp, Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, DoubleLeftOutlined } from '@ant-design/icons'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { ConversationsProps } from '@ant-design/x';
 import { useChatContext } from '../../context/ChatContext'
 
 
-const ChatList = () => {
+interface ChatListProps {
+    onClose: () => void;
+}
+
+const ChatList = ({ onClose }: ChatListProps) => {
     const {
         conversationsItems,
         activeKey,
@@ -27,6 +31,10 @@ const ChatList = () => {
         setActiveKey(key);
         navigate(`/dashboard/chats/${key}`);
     };
+
+    const onCloseSidebar = () => {
+        onClose();
+    }
 
     const menuConfig: ConversationsProps['menu'] = (conversation) => ({
         items: [
@@ -53,14 +61,25 @@ const ChatList = () => {
 
     return (
         <div className={styles.menu}>
-            <Button
-                onClick={onAddConversation}
-                type="link"
-                className={styles.addBtn}
-                icon={<PlusOutlined />}
-            >
-                New Conversation
-            </Button>
+            <div className={styles.option}>
+                <Tooltip placement="bottom" title="Add new conversation">
+                    <Button
+                        onClick={onAddConversation}
+                        type="link"
+                        className={styles.addBtn}
+                        icon={<PlusOutlined />}
+                    >
+                        New Conversation
+                    </Button>
+                </Tooltip>
+                <Tooltip placement="bottom" title="Close SideBar">
+                    <Button onClick={onCloseSidebar}
+                        type='link'
+                        className={styles.closeSidebar}
+                        icon={<DoubleLeftOutlined />}>
+                    </Button>
+                </Tooltip>
+            </div>
             <Conversations
                 items={conversationsItems}
                 className={styles.conversations}
