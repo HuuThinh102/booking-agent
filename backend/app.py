@@ -31,12 +31,12 @@ booking_agent = BookingAgent()
 frontend_folder = os.path.join(os.getcwd(),"..","frontend")
 dist_folder = os.path.join(frontend_folder, "dist")
 
-# @app.route("/", defaults={"filename":""})
-# @app.route("/<path:filename>")
-# def index(filename):
-#     if filename and os.path.exists(os.path.join(dist_folder, filename)):
-#         return send_from_directory(dist_folder, filename)
-#     return send_from_directory(dist_folder, "index.html")
+@app.route("/", defaults={"filename":""})
+@app.route("/<path:filename>")
+def index(filename):
+    if filename and os.path.exists(os.path.join(dist_folder, filename)):
+        return send_from_directory(dist_folder, filename)
+    return send_from_directory(dist_folder, "index.html")
 
 app.register_blueprint(auth_user_routes)
 app.register_blueprint(conversation_routes)
